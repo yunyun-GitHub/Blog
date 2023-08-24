@@ -20,4 +20,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),  # 用戶模塊接口
+    path('api/blogs/', include('blogs.urls')),  # 博客模塊接口
 ]

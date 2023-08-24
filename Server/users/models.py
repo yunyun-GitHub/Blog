@@ -14,7 +14,7 @@ class User(AbstractUser, BaseModel):
     """用戶模型"""
     email = models.EmailField(verbose_name='郵箱', unique=True)
     avatar = models.ImageField(verbose_name='用戶頭像', upload_to=get_image_path, blank=True, null=True)
-    role = models.ManyToManyField('Role', related_name='user', blank=True)
+    role = models.ManyToManyField('Role', verbose_name='角色', related_name='user', blank=True)  # 多对多字段null=True没有意义
 
     class Meta:
         db_table = 'users'
@@ -25,7 +25,7 @@ class User(AbstractUser, BaseModel):
 class Role(BaseModel):
     """角色模型"""
     name = models.CharField(verbose_name='角色名', max_length=32, unique=True)
-    api = models.ManyToManyField('API', related_name='role', blank=True)
+    api = models.ManyToManyField('API', verbose_name='權限', related_name='role', blank=True)
 
     class Meta:
         db_table = 'role'

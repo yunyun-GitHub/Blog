@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',  # 用於登錄
     'django_filters',  # 過濾器
     'users',
+    'blogs',
 ]
 
 MIDDLEWARE = [

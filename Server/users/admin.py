@@ -5,7 +5,7 @@ from users.models import User, Role, API
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['username', 'email', 'avatar']
+    list_display = ['username', 'email']
 
 
 @admin.register(Role)
