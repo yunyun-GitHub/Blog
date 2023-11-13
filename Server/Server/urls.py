@@ -16,9 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),  # 用戶模塊接口
     path('api/blogs/', include('blogs.urls')),  # 博客模塊接口
 ]
+
+if settings.DEBUG:  # 開發環境由django提供圖片訪問, 生產環境需要換nginx
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

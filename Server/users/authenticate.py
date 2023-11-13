@@ -21,4 +21,4 @@ class MyBackend(ModelBackend):
             if user.check_password(password):
                 return user
             else:
-                raise serializers.ValidationError({'error': "密碼不正塙"})
+                raise serializers.ValidationError({'error': "密碼不正確"})

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注冊</title>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 150px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .input-group {
+            display: flex;
+        }
+
+        .input-group button {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>注冊賬號</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">用戶名</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">郵箱</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密碼</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+                <label for="code">驗證碼</label>
+                <div class="input-group">
+                    <input type="text" id="code" name="code">
+                    <button type="button" id="get-code">獲取驗證碼</button>
+                </div>
+            </div>
+            <button type="submit">注冊</button>
+        </form>
+    </div>
+    <!-- <script src="script.js"></script> -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginForm = document.getElementById("login-form");
+            var code_id = 0;
+
+            loginForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
+                const email = document.getElementById("email").value;
+                const code = document.getElementById("code").value;
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/users/register/');
+                xhr.setRequestHeader('Content-Type', 'application/json');  // 设置请求头,例如要发送JSON数据,则设置请求头为这样
+                var data = { "username": username, "password": password, "email": email, "code": code, "code_id": code_id };
+                xhr.send(JSON.stringify(data));
+                xhr.onload = function () {
+                    if (xhr.status === 201) {
+                        alert("注冊成功, 跳轉至登錄頁面")
+                        window.location.href = "login.html";  // 跳转到其他页面
+                    } else {
+                        console.log('Error: ' + xhr.status);
+                        console.log(xhr.responseText);
+                        alert(xhr.responseText)
+                    }
+                };
+            });
+
+            // 获取验证码按钮点击事件处理
+            document.getElementById("get-code").addEventListener("click", function () {
+                const email = document.getElementById("email").value;
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/users/sendsms/');
+                xhr.setRequestHeader('Content-Type', 'application/json');  // 设置请求头,例如要发送JSON数据,则设置请求头为这样
+                var data = { "email": email };
+                xhr.send(JSON.stringify(data));
+                xhr.onload = function () {
+                    if (xhr.status === 201) {
+                        var response = JSON.parse(xhr.responseText);
+                        code_id = response.id;
+                        alert("驗證碼已發送至您的郵箱")
+                    } else {
+                        console.log('Error: ' + xhr.status);
+                        console.log(xhr.responseText);
+                        alert(xhr.responseText)
+                    }
+                };
+            });
+
+        });
+
+    </script>
+</body>
+
+</html>

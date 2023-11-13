@@ -20,30 +20,31 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# ************开发环境的配置************
-SECRET_KEY = 'django-insecure-hx9lpnwvs(*xiir@rrl0mhz1009##w-$hvhj=#8^l1qms83(g7'
+
 DEBUG = True
-ALLOWED_HOSTS = []
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+
+if DEBUG:  # 开发环境的配置
+    SECRET_KEY = 'django-insecure-hx9lpnwvs(*xiir@rrl0mhz1009##w-$hvhj=#8^l1qms83(g7'
+    ALLOWED_HOSTS = []
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
-# ************生产环境的配置************
-# SECRET_KEY = os.environ.get('SECRET_KEY')  # 生產環境,重新生成
-# DEBUG = False
-# ALLOWED_HOSTS = ['*']  # 允许所有主机连接
-# DATABASES = {
-#     'default': {
-#         'ENGINE': os.environ.get('DB_ENGINE'),  # 數據庫引擎
-#         'HOST': os.environ.get('DB_HOST'),  # 数据库主机或服务器域名
-#         'PORT': os.environ.get('DB_PORT'),  # 数据库端口
-#         'NAME': os.environ.get('DB_NAME'),  # 数据库名字
-#         'USER': os.environ.get('DB_USER'),  # 数据库用户名
-#         'PASSWORD': os.environ.get('DB_PASSWORD'),  # 数据库用户密码
-#     }
-# }
+else:  # 生产环境的配置
+    SECRET_KEY = os.environ.get('SECRET_KEY')  # 生產環境,重新生成
+    ALLOWED_HOSTS = ['*']  # 允许所有主机连接
+    DATABASES = {
+        'default': {
+            'ENGINE': os.environ.get('DB_ENGINE'),  # 數據庫引擎
+            'HOST': os.environ.get('DB_HOST'),  # 数据库主机或服务器域名
+            'PORT': os.environ.get('DB_PORT'),  # 数据库端口
+            'NAME': os.environ.get('DB_NAME'),  # 数据库名字
+            'USER': os.environ.get('DB_USER'),  # 数据库用户名
+            'PASSWORD': os.environ.get('DB_PASSWORD'),  # 数据库用户密码
+        }
+    }
 
 # Application definition
 

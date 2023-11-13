@@ -2,8 +2,9 @@
 import os
 import sys
 import django
+from Server.settings import BASE_DIR
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+sys.path.append(BASE_DIR)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Server.settings")
 django.setup()
 
@@ -60,5 +61,5 @@ def create_admin():
 
 
 create_role()  # 創建用戶角色
-create_api()  # 創建API信息
-create_admin()  # 創建admin用戶
+# create_api()  # 創建API信息
+# create_admin()  # 創建admin用戶

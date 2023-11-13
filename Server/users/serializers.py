@@ -2,9 +2,25 @@ import time
 
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from common.tool import Tools, Email
 from users.models import User, SMSCode
+
+
+class LoginSerializer(TokenObtainPairSerializer):
+    """用戶登錄的序列化器"""
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data['id'] = self.user.id  # 添加额外的返回信息
+        return data
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
 
 
 class UserSerializer(serializers.ModelSerializer):

@@ -1,131 +1,280 @@
-<!doctype html>
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-    <!-- 必须的 meta 标签 -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap 的 CSS 文件 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
-        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
-
-    <title>云云博客</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的博客</title>
+    <!-- <link rel="stylesheet" href="style.css"> -->
     <style>
+        /* 基本樣式 */
         body {
-            background-color: #e9ecef;
+            /* 指定元素的字體,首選使用 Arial 字體，如果計算機上沒有安裝 Arial 字體，則備用使用 sans-serif 字體 */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
         }
 
-        /* div {
-            border: 1px dashed #888888;
-        } */
-
-        .jumbotron {
-            padding-bottom: 10px;
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
         }
 
-        .right {
-            float: right;
+        nav {
+            display: flex;
+            justify-content: space-between;
         }
 
-        .lead {
+        nav ul {
             list-style: none;
             padding: 0;
-            margin: 0;
-            font-size: 1.2em;
         }
 
-        .lead li {
+        nav li {
+            /* 轉化為行內元素，而不會換行。 */
+            display: inline;
+            padding: 0 10px;
+        }
+
+        nav a {
+            /* 於移除文本的下劃線、上標記、刪除線等修飾 */
+            text-decoration: none;
+            color: #333;
+            /* 文本變成粗體 */
+            font-weight: bold;
+        }
+
+        main {
+            max-width: 800px;
+            min-height: 800px;
+            margin: 20px auto;
+        }
+
+        section {
+            cursor: pointer;
+            background-color: #f0f0f0;
+            padding: 1rem;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        section:hover {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        section p {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        .sidebar {
+            float: right;
+            width: 15%;
+            margin: 20px auto;
+            padding: 0px;
+            /* 內間距 */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .categories {
+            list-style-type: none;
+            padding: 5px;
+        }
+
+        .category {
+            /* 鼠標懸停在該元素上時變為手型游標，顯示出該元素是可點擊的*/
+            cursor: pointer;
             margin-bottom: 10px;
         }
 
-        .lead li a {
-            display: block;
-            color: #333;
-            text-decoration: none;
-            padding: 3px;
-            border-radius: 5px;
-            transition: background-color 0.2s ease-in-out;
+        .sub-categories {
+            display: none;
+            list-style-type: none;
+            padding-left: 0px;
         }
 
-        .lead li a:hover {
-            background-color: #ddd;
+        .sub-categories li {
+            margin: 10px auto;
+        }
+
+        .show {
+            display: block;
         }
     </style>
 </head>
 
 <body>
-    <div class="jumbotron">
-        <div class="container">
-            <h1 class="display-4">云云博客</h1>
-            <p class="lead">這是一個致力於分享有關程序設計、技術和開發的博客，博主經常分享他的專業知識和實踐經驗，幫助讀者更好地理解和掌握這些技能。</p>
-            <hr class="my-4">
-        </div>
-    </div>
+    <header>
+        <h1>昔我往矣，楊柳依依；今我來思，雨雪霏霏。</h1>
+    </header>
 
-    <div id="main">
-        <div class="container">
-            <div class="right dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown"
-                    aria-expanded="false">
-                    全部文章
-                </button>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="#">全部文章</a>
-                    <a class="dropdown-item" href="#">近期發佈</a>
-                    <a class="dropdown-item" href="#">人氣熱門</a>
-                </div>
+    <nav>
+        <ul>
+            <li><a href="#">首頁</a></li>
+            <li><a href="#">文章</a></li>
+            <li><a href="#">關於我</a></li>
+            <li><a href="#">聯繫我</a></li>
+        </ul>
+        <ul>
+            <div id="login" style="display: none;">
+                <li><a href="edit.html" target="_blank">創建博客</a></li>
+                <li><a href="#" id="logoutLink">注銷</a></li>
             </div>
+            <div id="logout">
+                <li><a href="login.html">登錄</a></li>
+                <li><a href="register.html">注冊</a></li>
+            </div>
+        </ul>
+    </nav>
 
-            <ul class="lead">
-                <li><a href="#">在Ubuntu上安装Docker</a></li>
-                <li><a href="#">VMware安装Ubuntu</a></li>
-                <li><a href="#">docker常用命令</a></li>
-                <li><a href="#">在Ubuntu上安装Docker</a></li>
-                <li><a href="#">VMware安装Ubuntu</a></li>
-                <li><a href="#">docker常用命令</a></li>
-                <li><a href="#">在Ubuntu上安装Docker</a></li>
-                <li><a href="#">VMware安装Ubuntu</a></li>
-                <li><a href="#">docker常用命令</a></li>
-                <li><a href="#">在Ubuntu上安装Docker</a></li>
-                <li><a href="#">VMware安装Ubuntu</a></li>
-                <li><a href="#">docker常用命令</a></li>
-                <li><a href="#">在Ubuntu上安装Docker</a></li>
-                <li><a href="#">VMware安装Ubuntu</a></li>
-                <li><a href="#">docker常用命令</a></li>
-                <li><a href="#">在Ubuntu上安装Docker</a></li>
-                <li><a href="#">VMware安装Ubuntu</a></li>
-                <li><a href="#">docker常用命令</a></li>
-                <li><a href="#">在Ubuntu上安装Docker</a></li>
-                <li><a href="#">VMware安装Ubuntu</a></li>
-                <li><a href="#">docker常用命令</a></li>
-                <li><a href="#">在Ubuntu上安装Docker</a></li>
-                <li><a href="#">VMware安装Ubuntu</a></li>
-                <li><a href="#">docker常用命令</a></li>
-                <li><a href="#">在Ubuntu上安装Docker</a></li>
-                <li><a href="#">VMware安装Ubuntu</a></li>
-                <li><a href="#">docker常用命令</a></li>
-            </ul>
-        </div>
-    </div>
+    <aside class="sidebar">
+        <ul class="categories">
+            <li class="category">
+                人氣熱門
+                <ul class="sub-categories">
+                    <li>docker常用命令</li>
+                    <li>VMware安装Ubuntu</li>
+                    <li>在Ubuntu上安装Docker</li>
+                    <li>在win10安装WSL</li>
+                </ul>
+            </li>
+            <li class="category">
+                近期發佈
+                <ul class="sub-categories">
+                    <li>docker常用命令</li>
+                    <li>VMware安装Ubuntu</li>
+                    <li>在Ubuntu上安装Docker</li>
+                    <li>在win10安装WSL</li>
+                </ul>
+            </li>
+            <li class="category">
+                我的文章
+                <ul class="sub-categories">
+                    <li>docker常用命令</li>
+                    <li>VMware安装Ubuntu</li>
+                    <li>在Ubuntu上安装Docker</li>
+                    <li>在win10安装WSL</li>
+                </ul>
+            </li>
+        </ul>
+    </aside>
 
+    <main></main>
 
-    <!-- JavaScript 文件是可选的。从以下两种建议中选择一个即可！ -->
+    <footer>
+        <p>&copy; 2023 我的博客</p>
+    </footer>
 
-    <!-- 选项 1：jQuery 和 Bootstrap 集成包（集成了 Popper） -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
-        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
-        crossorigin="anonymous"></script>
+    <!-- <script src="script.js"></script> -->
+    <script>
+        // 文章分類
+        const categories = document.querySelectorAll('.category');
+        categories.forEach(category => {
+            category.addEventListener('click', () => {
+                const subCategories = category.querySelector('.sub-categories');
+                subCategories.classList.toggle('show');
+            });
+        });
 
-    <!-- 选项 2：Popper 和 Bootstrap 的 JS 插件各自独立 -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
-    -->
+        // 點擊section進入文章詳情
+        const mainElement = document.querySelector("main");
+        mainElement.addEventListener("click", function (event) {
+            if (!window.getSelection().toString() && mainElement !== event.target) {  // 不是滑動選擇文字,并且點擊的不是main元素
+                let section = event.target;
+                if (section.tagName !== "SECTION") { section = section.parentElement; }
+                window.open("article.html?id=" + section.id, "_blank");
+            }
+        });
+
+        // 點擊注銷, 推出登錄
+        document.getElementById('logoutLink').addEventListener('click', function (event) {
+            event.preventDefault();
+            localStorage.removeItem('access'); // 删除本地存储中的JWT令牌
+            location.reload(); // 刷新页面
+        });
+
+        (async function () {  // 根據是否登錄顯示身份狀態, 以及請求網頁數據
+            if (await checkLoginStatus()) {
+                document.getElementById("login").style.display = "block";
+                document.getElementById("logout").style.display = "none";
+                await fetchAndProcessBlogs(true);
+            } else {
+                document.getElementById("login").style.display = "none";
+                document.getElementById("logout").style.display = "block";
+                await fetchAndProcessBlogs();
+            }
+        })();
+
+        async function checkLoginStatus() {  // 檢查是否登錄
+            const access = localStorage.getItem('access');
+            const refresh = localStorage.getItem('refresh');
+            if (access) {
+                const response_access = await fetch('/api/users/token/verify/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ "token": access })
+                });
+                if (response_access.status === 200) {
+                    return true;
+                } else if (response_access.status === 401 && refresh) {  // 如果訪問令牌過期, 嘗試刷新令牌
+                    const response_refresh = await fetch('/api/users/token/verify/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ "token": refresh })
+                    });
+                    if (response_refresh.status === 200) {
+                        const response_refresh_access = await fetch('/api/users/token/refresh/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ "refresh": refresh })
+                        });
+                        if (response_refresh_access.status === 200) {
+                            const data = await response_refresh_access.json();
+                            localStorage.setItem('access', data.access);  // 存储访问令牌到本地存储
+                            return true;
+                        } else { return false; }
+                    } else { return false; }
+                } else { return false; }
+            } else { return false; }
+        }
+
+        async function fetchAndProcessBlogs(isLogin = false) {  // 請求網頁數據
+            const headers = {};
+            if (isLogin) {
+                headers["Authorization"] = `Bearer ${localStorage.getItem('access')}`;
+            }
+            const response = await fetch('/api/blogs/blog/', { headers: headers });
+            if (response.status === 200) {  // 渲染頁面
+                const blogs = await response.json();
+                const listElement = document.querySelector("main");
+                blogs.forEach(blog => {
+                    const section = document.createElement('section');
+                    section.id = blog.id;
+                    const plainText = blog.content.replace(/<[^>]*>/g, '');
+                    section.innerHTML = `
+                        <h2>${blog.title}</h2>
+                        <p>${plainText}</p>
+                    `;
+                    listElement.appendChild(section);
+                });
+            } else {
+                const errorText = await response.text();
+                throw new Error(response.status + ' - ' + errorText);
+            }
+        }
+
+    </script>
 </body>
 
 </html>

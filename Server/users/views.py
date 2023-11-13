@@ -1,10 +1,16 @@
 from rest_framework import mixins
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.viewsets import GenericViewSet
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from users.models import User, SMSCode
 from users.permissions import UserPermission, APIPermission
-from users.serializers import UserSerializer, SMSCodeSerializer
+from users.serializers import UserSerializer, SMSCodeSerializer, LoginSerializer
+
+
+class LoginView(TokenObtainPairView):
+    """用戶登錄"""
+    serializer_class = LoginSerializer
 
 
 class UserView(GenericViewSet, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
