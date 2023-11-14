@@ -108,7 +108,10 @@
                         throw new Error(response.status + ' - ' + errorText);
                     }
                 } else {
-                    window.open("login.html", "_blank");
+                    var confirmLogin = confirm("登錄已過期, 請重新登錄!");
+                    if (confirmLogin) {
+                        window.open("login.html", "_blank");
+                    }
                 }
             }
         });
