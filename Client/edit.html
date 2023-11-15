@@ -250,55 +250,47 @@
         }
 
 
-        function pasteImage(e) {
+        async function pasteImage(e) {
             var clipboardData = e.clipboardData || window.clipboardData;  // 获取粘贴板的内容
-            let hasImage = false;
-            if (clipboardData && clipboardData.items) {
-                for (const item of clipboardData.items) {
-                    if (item.type.indexOf('image') !== -1) {
-                        hasImage = true;
-                        const blob = item.getAsFile();  // 提取图像数据
-                        uploadImage(blob)  // 上传图片
-                            .then(result => {  // 如果上传成功就插入图片
-                                quill.insertEmbed(quill.getSelection(focus = true).index, 'image', '/media/' + result.image);
-                                // quill.setSelection(quill.getSelection(focus = true).index + 1);
-                            })
-                            .catch(error => {
-                                alert(error);
-                                console.error('上传失败:', error);
-                            });
+            var imageArray = [];
+            for (const item of clipboardData.items) {
+                if (item.type.indexOf('image') !== -1) {
+                    const blob = item.getAsFile();  // 提取图像数据
+                    imageArray.push(blob);
+                }
+            }
+            if (imageArray.length > 0) {
+                e.preventDefault();  // 阻止默认的粘贴行为
+                if (await checkLoginStatus()) {
+                    for (const blob of imageArray) {
+                        const data = await uploadImage(blob);
+                        quill.insertEmbed(quill.getSelection(focus = true).index, 'image', '/media/' + data.image);
+                        quill.setSelection(quill.getSelection(focus = true).index + 1);
+                    }
+                } else {
+                    var confirmLogin = confirm("登錄已過期, 請重新登錄!");
+                    if (confirmLogin) {
+                        window.open("login.html", "_blank");
                     }
                 }
             }
-            if (hasImage) {
-                e.preventDefault();  // 阻止默认的粘贴行为
-            }
         }
 
-        function uploadImage(imageFile) {
-            const access = localStorage.getItem('access');
-            const url = '/api/blogs/image/upload/';
-
+        async function uploadImage(imageFile) {
             const formData = new FormData();
             formData.append('image', imageFile);
 
-            // 返回fetch的Promise对象
-            return fetch(url, {
+            const response = await fetch('/api/blogs/image/upload/', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${access}`
-                },
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('access')}` },
                 body: formData
-            })
-                .then(response => {
-                    if (response.status === 201) {
-                        return response.json();
-                    } else {
-                        return response.text().then(errorText => {
-                            throw new Error(response.status + ' - ' + errorText);
-                        });
-                    }
-                })
+            });
+            if (response.status === 201) {
+                return await response.json();
+            } else {
+                const errorText = await response.text();
+                throw new Error(response.status + ' - ' + errorText);
+            }
         }
 
         async function checkLoginStatus() {  // 檢查是否登錄
