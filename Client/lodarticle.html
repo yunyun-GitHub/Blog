@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
+    <style>
+        /* 基本樣式 */
+        body {
+            /* 指定元素的字體,首選使用 Arial 字體，如果計算機上沒有安裝 Arial 字體，則備用使用 sans-serif 字體 */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        action {
+            float: right;
+            display: none;
+        }
+
+        action button {
+            border: none;
+        }
+
+        article {
+            background-color: #f0f0f0;
+            padding: 1rem;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #title {
+            margin: 17px 0px 5px 0px;
+            padding-left: 0px;
+            width: 100%;
+            border: none;
+            /*去掉選中時的邊框*/
+            outline: none;
+            font-size: 24px;
+            font-weight: bold;
+            background-color: #f0f0f0;
+        }
+
+        #title::placeholder {
+            font-weight: normal;
+        }
+
+        article #editor {
+            outline: none;
+            margin-top: 40px;
+        }
+
+        article #editor img {
+            max-width: 100%;
+        }
+
+        article #editor p {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        #editor .ql-editor {
+            padding: 0;
+            /* min-height: 200px; */
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <action><button id="edit">✏️</button><button id="delete">🗑️</button></action>
+        <article>
+            <input type="text" id="title" placeholder="請在這裏輸入標題,長度不超過32" maxlength="32" required readonly>
+            <p id="release-date">發布日期：2023-09-14</p>
+            <p id="author">作者：Aidan</p>
+            <div id="editor">
+                <p>請在這裏輸入内容。。。</p>
+            </div>
+        </article>
+    </main>
+
+    <!-- <script src="script.js"></script> -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+        document.getElementById("delete").addEventListener("click", handleDelete);
+
+        async function handleDelete() {
+            var confirmDelete = confirm("確定要刪除這篇文章嗎？");
+            if (confirmDelete) {  // 在這裡處理刪除操作
+                if (await checkLoginStatus()) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const articleId = urlParams.get('id');  // 獲取url中的參數
+                    const response = await fetch('/api/blogs/blog/' + articleId, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('access')}` },
+                    });
+                    if (response.status === 204) {  // 渲染頁面
+                        window.location.href = "index.html";  // 跳转到其他页面
+                    } else {
+                        const errorText = await response.text();
+                        throw new Error(response.status + ' - ' + errorText);
+                    }
+                } else {
+                    var confirmLogin = confirm("登錄已過期, 請重新登錄!");
+                    if (confirmLogin) {
+                        window.open("login.html", "_blank");
+                    }
+                }
+            }
+        }
+
+        (async function () {  // 根據是否登錄顯示action狀態, 以及請求網頁數據
+            const isLogin = await checkLoginStatus();
+            const blog = await fetchArticle(isLogin);
+
+            const actionElement = document.querySelector("action");
+            actionElement.style.display = isLogin && (blog.authorId === localStorage.getItem('userId')) ? "block" : "none";
+
+            document.title = blog.title;
+            const article = document.querySelector("article");
+
+            document.querySelector("#title").value = blog.title;
+            document.querySelector("#release-date").textContent = `發布日期：${blog.update_time.split('T')[0]}`;
+            document.querySelector("#author").textContent = `作者：${blog.author}`;
+            document.querySelector("#editor").innerHTML = blog.content;
+
+            const quill = new Quill('#editor', {
+                theme: 'bubble',
+                readOnly: true,
+                formats: ['bold', 'italic', 'underline', 'strike', 'image'],  // 只允许白名單格式
+                modules: {
+                    toolbar: ['bold', 'italic', 'underline', 'strike'],
+                },
+                clipboard: {
+                    // 默认情况下，Quill是不会为每一行提供填充(padding)或边距(margin)的，但是从其他网站或来源粘贴过来的可能会含有
+                    // 默认情况下，Quill通过添加额外行来匹配这个间距，以弥补缺失的margin/padding。这个选择项将禁用这个行为。
+                    matchVisual: false,
+                }
+
+            });
+            document.getElementById("edit").addEventListener("click", function () {
+                quill.enable(!quill.isEnabled());
+                const title = document.querySelector("#title")
+                title.readOnly = !title.readOnly;
+                title.focus();
+                actionElement.style.display = "none";
+            });
+
+        })();
+
+        async function fetchArticle(isLogin = false) {  // 請求網頁數據
+            const headers = {};
+            if (isLogin) {
+                headers["Authorization"] = `Bearer ${localStorage.getItem('access')}`;
+            }
+            const urlParams = new URLSearchParams(window.location.search);
+            const articleId = urlParams.get('id');  // 獲取url中的參數
+
+            const response = await fetch('/api/blogs/blog/' + articleId, { headers: headers });
+            if (response.status === 200) {  // 渲染頁面
+                const blog = await response.json();
+                return blog;
+            } else {
+                const errorText = await response.text();
+                throw new Error(response.status + ' - ' + errorText);
+            }
+        }
+
+        async function checkLoginStatus() {  // 檢查是否登錄
+            const access = localStorage.getItem('access');
+            const refresh = localStorage.getItem('refresh');
+            if (access) {
+                const response_access = await fetch('/api/users/token/verify/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ "token": access })
+                });
+                if (response_access.status === 200) {
+                    return true;
+                } else if (response_access.status === 401 && refresh) {  // 如果訪問令牌過期, 嘗試刷新令牌
+                    const response_refresh = await fetch('/api/users/token/verify/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ "token": refresh })
+                    });
+                    if (response_refresh.status === 200) {
+                        const response_refresh_access = await fetch('/api/users/token/refresh/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ "refresh": refresh })
+                        });
+                        if (response_refresh_access.status === 200) {
+                            const data = await response_refresh_access.json();
+                            localStorage.setItem('access', data.access);  // 存储访问令牌到本地存储
+                            return true;
+                        } else { return false; }
+                    } else { return false; }
+                } else { return false; }
+            } else { return false; }
+        }
+    </script>
+</body>
+
+</html>

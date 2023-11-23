@@ -4,9 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>創作博客</title>
     <!-- <link rel="stylesheet" href="style.css"> -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.bubble.css" rel="stylesheet">
+
+
     <style>
         /* 基本樣式 */
         body {
@@ -17,9 +19,73 @@
             background-color: #f0f0f0;
         }
 
+        .toolbarPh {
+            position: fixed;
+            display: none;
+            width: 100%;
+            height: 38px;
+            top: 0;
+            z-index: 1;
+        }
+
+        nav {
+            position: fixed;
+            width: 100%;
+            top: 0px;
+            display: none;
+            justify-content: space-around;
+            background-color: #f0f0f0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin: 0 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        nav ul li span {
+            visibility: hidden;
+            background-color: #ffffff;
+            font-weight: normal;
+            color: #3d3d3d;
+            white-space: nowrap;
+            border-radius: 6px;
+            padding: 3px;
+            position: absolute;
+            bottom: -175%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        nav ul li:hover span {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        #release {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 3px;
+        }
+
+        #release:hover {
+            background-color: #0056b3;
+        }
+
         main {
             max-width: 800px;
-            margin: 20px auto;
+            margin: 20px auto 20px;
         }
 
         action {
@@ -38,7 +104,7 @@
         }
 
         #title {
-            margin: 17px 0px 5px 0px;
+            margin: 20px 0px 5px 0px;
             padding-left: 0px;
             width: 100%;
             border: none;
@@ -53,33 +119,41 @@
             font-weight: normal;
         }
 
-        article #editor {
+        #editor {
             outline: none;
             margin-top: 40px;
-        }
-
-        article #editor img {
-            max-width: 100%;
-        }
-
-        article #editor p {
-            margin: 0;
-            font-size: 16px;
-            line-height: 1.6;
         }
 
         #editor .ql-editor {
             padding: 0;
             /* min-height: 200px; */
         }
+
+        #editor p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
     </style>
 </head>
 
 <body>
+    <div class="toolbarPh"></div>
+    <nav>
+        <ul>
+            <li><strong id="bold">B</strong><span>加粗</span></li>
+            <li><em id="italic" style="font-family: Consolas; font-size: 19px;">I</em><span>斜體</span></li>
+            <li><u id="underline">U</u><span>下劃綫</span></li>
+            <li><s id="strike">S</s><span>刪除綫</span></li>
+        </ul>
+        <ul>
+            <li id="release">發佈</li>
+        </ul>
+    </nav>
+
     <main>
         <action><button id="edit">✏️</button><button id="delete">🗑️</button></action>
         <article>
-            <input type="text" id="title" placeholder="請在這裏輸入標題,長度不超過32" maxlength="32" required readonly>
+            <input type="text" id="title" placeholder="請在這裏輸入標題,長度不超過32" maxlength="32" required>
             <p id="release-date">發布日期：2023-09-14</p>
             <p id="author">作者：Aidan</p>
             <div id="editor">
@@ -88,17 +162,67 @@
         </article>
     </main>
 
-    <!-- <script src="script.js"></script> -->
+    <!-- <script src=" script.js"></script> -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
-        document.getElementById("delete").addEventListener("click", handleDelete);
+        // 创建全局變量quill实例
+        const quill = new Quill('#editor', {
+            theme: 'bubble',
+            formats: ['bold', 'italic', 'underline', 'strike', 'image'],  // 只允许白名單格式
+            modules: {
+                toolbar: ['bold', 'italic', 'underline', 'strike'],
+            },
+            clipboard: {
+                // 默认情况下，Quill是不会为每一行提供填充(padding)或边距(margin)的，但是从其他网站或来源粘贴过来的可能会含有
+                // 默认情况下，Quill通过添加额外行来匹配这个间距，以弥补缺失的margin/padding。这个选择项将禁用这个行为。
+                matchVisual: false,
+            }
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const articleId = urlParams.get('id');  // 獲取url中的參數
+        if (articleId) {
+            console.log("這裏是文章詳情, id=", articleId);
+            setupDetailPage(); // 設置詳情頁面
+        } else {
+            console.log("這裏是創建文章");
+            setupCreationPage();  // 設置創建頁面
+        }
+
+        // =================詳情頁面函數=================
+
+        async function setupDetailPage() {
+            const isLogin = await checkLoginStatus();  // 檢查是否登錄
+            const blog = await fetchArticle(isLogin);  // 請求網頁數據
+            document.title = blog.title;  // 設置網頁標題
+
+            const actionElement = document.querySelector("action");  // 是當前用戶的文章就顯示編輯刪除按鈕
+            actionElement.style.display = isLogin && (blog.authorId === localStorage.getItem('userId')) ? "block" : "none";
+
+            const title = document.querySelector("#title")
+            title.readOnly = true;  // 設置標題只讀
+            quill.enable(false);  // 設置編輯器只讀
+
+            // 填充文章標題, 日期, 作者, 内容
+            title.value = blog.title;
+            document.querySelector("#release-date").textContent = `發布日期：${blog.update_time.split('T')[0]}`;
+            document.querySelector("#author").textContent = `作者：${blog.author}`;
+            quill.clipboard.dangerouslyPasteHTML(blog.content);
+
+            document.getElementById("delete").addEventListener("click", handleDelete);  // 點擊刪除按鈕刪除文章
+            document.getElementById("edit").addEventListener("click", function () {  // 點擊編輯按鈕編輯文章
+                actionElement.style.display = "none";
+                setupCreationPage();  // 設置工具欄自動隱藏和展示
+                quill.enable(!quill.isEnabled());
+                title.readOnly = !title.readOnly;
+                title.focus();
+            });
+        }
 
         async function handleDelete() {
             var confirmDelete = confirm("確定要刪除這篇文章嗎？");
             if (confirmDelete) {  // 在這裡處理刪除操作
                 if (await checkLoginStatus()) {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const articleId = urlParams.get('id');  // 獲取url中的參數
                     const response = await fetch('/api/blogs/blog/' + articleId, {
                         method: 'DELETE',
                         headers: { 'Authorization': `Bearer ${localStorage.getItem('access')}` },
@@ -118,57 +242,122 @@
             }
         }
 
-        (async function () {  // 根據是否登錄顯示action狀態, 以及請求網頁數據
-            const isLogin = await checkLoginStatus();
-            const blog = await fetchArticle(isLogin);
-
-            const actionElement = document.querySelector("action");
-            actionElement.style.display = isLogin && (blog.authorId === localStorage.getItem('userId')) ? "block" : "none";
-
-            document.title = blog.title;
-            const article = document.querySelector("article");
-
-            document.querySelector("#title").value = blog.title;
-            document.querySelector("#release-date").textContent = `發布日期：${blog.update_time.split('T')[0]}`;
-            document.querySelector("#author").textContent = `作者：${blog.author}`;
-            document.querySelector("#editor").innerHTML = blog.content;
-
-            const quill = new Quill('#editor', {
-                theme: 'bubble',
-                readOnly: true,
-                formats: ['bold', 'italic', 'underline', 'strike', 'image'],  // 只允许白名單格式
-                modules: {
-                    toolbar: ['bold', 'italic', 'underline', 'strike'],
-                },
-                clipboard: {
-                    // 默认情况下，Quill是不会为每一行提供填充(padding)或边距(margin)的，但是从其他网站或来源粘贴过来的可能会含有
-                    // 默认情况下，Quill通过添加额外行来匹配这个间距，以弥补缺失的margin/padding。这个选择项将禁用这个行为。
-                    matchVisual: false,
-                }
-
-            });
-            document.getElementById("edit").addEventListener("click", function () {
-                quill.enable(!quill.isEnabled());
-                const title = document.querySelector("#title")
-                title.readOnly = !title.readOnly;
-                title.focus();
-                actionElement.style.display = "none";
-            });
-
-        })();
-
         async function fetchArticle(isLogin = false) {  // 請求網頁數據
             const headers = {};
-            if (isLogin) {
+            if (isLogin) {  // 如果已登錄就不使用匿名身份
                 headers["Authorization"] = `Bearer ${localStorage.getItem('access')}`;
             }
-            const urlParams = new URLSearchParams(window.location.search);
-            const articleId = urlParams.get('id');  // 獲取url中的參數
-
             const response = await fetch('/api/blogs/blog/' + articleId, { headers: headers });
-            if (response.status === 200) {  // 渲染頁面
+            if (response.status === 200) {
                 const blog = await response.json();
                 return blog;
+            } else {
+                const errorText = await response.text();
+                throw new Error(response.status + ' - ' + errorText);
+            }
+        }
+
+        // =================創建頁面函數=================
+
+        function setupCreationPage() {
+            setupToolbarBehavior();  // 設置工具欄自動隱藏和展示
+
+            quill.clipboard.addMatcher(Node.ELEMENT_NODE, function (node, delta) {
+                if (delta.ops.length > 0) {
+                    delta.ops[0].attributes = {}; // 如果是元素节点则清空样式
+                }
+                return delta;
+            });
+            quill.clipboard.addMatcher("img", function (node, delta) {
+                url = delta.ops[0].insert.image
+                console.log(url);  // 如果是图片节点, 在這裏實現圖片的處理邏輯, 例如上傳服務器等
+                return delta;
+            });
+            quill.root.addEventListener('paste', pasteImage);  // 為quill編輯器自己編寫粘贴图片的功能
+        }
+
+        function setupToolbarBehavior() {  // 工具欄自動根據鼠標 位置在頂部時隱藏和展示
+            const toolbar = document.querySelector("nav");
+            const toolbarPh = document.querySelector(".toolbarPh");
+
+            toolbarPh.style.display = "block";
+            toolbarPh.addEventListener("mouseenter", () => toolbar.style.display = "flex");  // 鼠標進入顯示工具欄
+            toolbar.addEventListener("mouseleave", () => toolbar.style.display = "none");  // 鼠標離開隱藏工具欄
+
+            // 阻止鼠標點擊工具欄導致編輯器失去焦點, 必須使用mousedown事件，若用click事件，則不起作用
+            toolbar.addEventListener("mousedown", event => event.preventDefault());
+            // 使用事件委托為工具欄按鈕添加功能, 打開或關閉特定格式。
+            toolbar.addEventListener("click", (e) => quill.format(e.target.id, !quill.getFormat()[e.target.id]));
+            document.querySelector("#release").addEventListener("click", handleRelease);  // 點擊發佈按鈕發佈文章
+        }
+
+        async function handleRelease() {
+            var method = 'POST';
+            var url = '/api/blogs/blog/'
+            if (articleId) {
+                method = 'PATCH';
+                url = url + articleId + '/';
+            }
+            const title = document.getElementById("title").value;
+            const content = quill.root.innerHTML;
+            if (await checkLoginStatus()) {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('access')}` },
+                    body: JSON.stringify({ "title": title, "content": content })
+                });
+                if (response.ok === true) {
+                    const data = await response.json();
+                    window.location.href = 'article.html?id=' + data.id;  // 重定向到其他页面
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(response.status + ' - ' + errorText);
+                }
+            } else {
+                var confirmLogin = confirm("登錄已過期, 請重新登錄!");
+                if (confirmLogin) {
+                    window.open("login.html", "_blank");
+                }
+            }
+        }
+
+        async function pasteImage(e) {
+            var clipboardData = e.clipboardData || window.clipboardData;  // 获取粘贴板的内容
+            var imageArray = [];
+            for (const item of clipboardData.items) {
+                if (item.type.indexOf('image') !== -1) {
+                    const blob = item.getAsFile();  // 提取图像数据
+                    imageArray.push(blob);
+                }
+            }
+            if (imageArray.length > 0) {
+                e.preventDefault();  // 阻止默认的粘贴行为
+                if (await checkLoginStatus()) {
+                    for (const blob of imageArray) {
+                        const data = await uploadImage(blob);
+                        quill.insertEmbed(quill.getSelection(focus = true).index, 'image', '/media/' + data.image);
+                        quill.setSelection(quill.getSelection(focus = true).index + 1);
+                    }
+                } else {
+                    var confirmLogin = confirm("登錄已過期, 請重新登錄!");
+                    if (confirmLogin) {
+                        window.open("login.html", "_blank");
+                    }
+                }
+            }
+        }
+
+        async function uploadImage(imageFile) {
+            const formData = new FormData();
+            formData.append('image', imageFile);
+
+            const response = await fetch('/api/blogs/image/upload/', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('access')}` },
+                body: formData
+            });
+            if (response.status === 201) {
+                return await response.json();
             } else {
                 const errorText = await response.text();
                 throw new Error(response.status + ' - ' + errorText);
