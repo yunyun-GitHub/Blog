@@ -60,6 +60,6 @@ def create_admin():
         print(data['username'], "已存在")
 
 
-create_role()  # 創建用戶角色
+# create_role()  # 創建用戶角色
 # create_api()  # 創建API信息
 # create_admin()  # 創建admin用戶
