@@ -2,5 +2,6 @@
 Server/.idea/
 Server/venv/
 Server/media/
+Server/static/
 Server/db.sqlite3
 Server/**/__pycache__/
