@@ -33,6 +33,14 @@ def create_api():
         {'api': 'users.views.UserView.partial_update', 'name': '修改用戶信息'},
 
         {'api': 'users.views.SMSCodeView.create', 'name': '發送驗證碼'},
+
+        {'api': 'blogs.views.BlogView.list', 'name': '獲取博客列表'},
+        {'api': 'blogs.views.BlogView.create', 'name': '創建博客'},
+        {'api': 'blogs.views.BlogView.retrieve', 'name': '獲取單個博客'},
+        {'api': 'blogs.views.BlogView.destroy', 'name': '刪除博客'},
+        {'api': 'blogs.views.BlogView.partial_update', 'name': '修改博客'},
+
+        {'api': 'blogs.views.ImageView.create', 'name': '上传图片'},
     ]
     for data in api_list:
         # 检查数据是否已存在
@@ -44,6 +52,28 @@ def create_api():
                 print(data['name'], "已存在")
         else:
             print(data['api'], "已存在")
+
+
+def role_add_api():
+    """為角色添加權限"""
+    role_list = {
+        'AnonymousUser': ['注冊用戶', '發送驗證碼', '獲取博客列表', '獲取單個博客'],
+        'NormalUser': ['發送驗證碼', '獲取博客列表', '獲取單個博客', '創建博客', '刪除博客', '修改博客', '上传图片', '獲取用戶信息', '修改用戶信息'],
+    }
+
+    for role, apis in role_list.items():
+        if r := Role.objects.filter(name=role).first():
+            for api in apis:
+                if a := API.objects.filter(name=api).first():
+                    if r.api.filter(name=api).exists():
+                        print(role, api, '已存在')
+                    else:
+                        r.api.add(a)
+                        print(role, api, '添加成功')
+                else:
+                    print(api, '不存在')
+        else:
+            print(role, '不存在')
 
 
 def create_admin():
@@ -60,6 +90,7 @@ def create_admin():
         print(data['username'], "已存在")
 
 
-# create_role()  # 創建用戶角色
-# create_api()  # 創建API信息
-# create_admin()  # 創建admin用戶
+create_role()  # 創建用戶角色
+create_api()  # 創建API信息
+create_admin()  # 創建admin用戶
+role_add_api()  # 為角色添加權限
