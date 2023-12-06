@@ -13,17 +13,17 @@ services:
     networks:
       - network
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "${DB_USER}", "-p${DB_PASSWORD}"]
+      test: mysqladmin ping -h localhost -u ${DB_USER} -p${DB_PASSWORD}
       interval: 10s
       timeout: 5s
       retries: 5
 
-  webapp:
+  webserver:
     build:
-      context: ./Server/
+      context: ./Server/  # 上下文路徑
       dockerfile: ./Dockerfile
-    image: webapp
-    container_name: webapp
+    image: webserver
+    container_name: webserver
     command: python manage.py runserver 0.0.0.0:8000
     environment:
       SECRET_KEY: ${SECRET_KEY}
@@ -55,7 +55,7 @@ services:
     networks:
       - network
     depends_on:
-      - webapp
+      - webserver
 
 networks:
-  network:
+  network: {}
