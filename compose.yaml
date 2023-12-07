@@ -24,6 +24,7 @@ services:
       dockerfile: ./Dockerfile
     image: webserver
     container_name: webserver
+    entrypoint: python manage.py migrate  # 指定容器启动时执行的脚本
     command: python manage.py runserver 0.0.0.0:8000
     environment:
       SECRET_KEY: ${SECRET_KEY}
