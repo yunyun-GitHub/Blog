@@ -2,9 +2,8 @@
 import os
 import sys
 import django
-from Server.settings import BASE_DIR
 
-sys.path.append(BASE_DIR)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Server.settings")
 django.setup()
 
@@ -13,6 +12,7 @@ from users.models import Role, API, User
 
 def create_role():
     """創建用戶角色"""
+    print("========創建用戶角色========")
     role_list = [
         'AnonymousUser',
         'NormalUser',
@@ -27,6 +27,7 @@ def create_role():
 
 def create_api():
     """創建API信息"""
+    print("========創建API信息========")
     api_list = [
         {'api': 'users.views.UserView.create', 'name': '注冊用戶'},
         {'api': 'users.views.UserView.retrieve', 'name': '獲取用戶信息'},
@@ -56,6 +57,7 @@ def create_api():
 
 def role_add_api():
     """為角色添加權限"""
+    print("========為角色添加權限========")
     role_list = {
         'AnonymousUser': ['注冊用戶', '發送驗證碼', '獲取博客列表', '獲取單個博客'],
         'NormalUser': ['發送驗證碼', '獲取博客列表', '獲取單個博客', '創建博客', '刪除博客', '修改博客', '上传图片', '獲取用戶信息', '修改用戶信息'],
@@ -78,6 +80,7 @@ def role_add_api():
 
 def create_admin():
     """創建admin用戶"""
+    print("========創建admin用戶========")
     data = {'username': 'admin', 'password': 'admin', 'email': 'admin@gmail.com'}
 
     if not User.objects.filter(username=data['username']).exists():
