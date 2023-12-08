@@ -1,5 +1,8 @@
+import logging
 import random
 import string
+
+logger = logging.getLogger('simple')
 
 
 class Tools:
@@ -17,5 +20,5 @@ class Email:
 
     @staticmethod
     def send(email: str, code: str):
-        print("假裝發送驗證碼[email:{}, 驗證碼:{}]".format(email, code))
+        logger.info(f"假裝發送驗證碼[email:{email}, 驗證碼:{code}]")
         return {'code': "OK", "message": "驗證碼發送成功"}

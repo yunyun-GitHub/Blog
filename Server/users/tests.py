@@ -1,3 +1,3 @@
-from django.core.management.utils import get_random_secret_key
+from django.test import TestCase
 
-print(get_random_secret_key())
+# Create your tests here.

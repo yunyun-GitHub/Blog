@@ -1,5 +1,6 @@
 from rest_framework import permissions
 
+from common.tool import logger
 from users.models import API
 
 
@@ -13,7 +14,7 @@ class APIPermission(permissions.BasePermission):
         # 視圖函數繼承ViewSet情況下,view才有action屬性,否則使用request.method屬性
         action = getattr(view, 'action', request.method)
         api = f"{view.__class__.__module__}.{view.__class__.__name__}.{action}"
-        print(api, request.method, request.user)
+        logger.info(f"{api} {request.method} {request.user}")
 
         if not request.user.is_authenticated:  # 如果沒有登錄,使用預置的AnonymousUser查詢角色
             return API.objects.filter(api=api, role__name='AnonymousUser').exists()

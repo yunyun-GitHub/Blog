@@ -184,3 +184,28 @@ SIMPLE_JWT = {
 AUTHENTICATION_BACKENDS = [
     'users.authenticate.MyBackend'
 ]
+
+# 配置日志
+LOGGING = {
+    "version": 1,
+    'disable_existing_loggers': False,  # 不禁用现有记录器
+    "formatters": {
+        "simple": {
+            "format": '[%(asctime)s] %(message)s'
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "INFO",
+            "formatter": "simple"
+        },
+    },
+    "loggers": {
+        "simple": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": True
+        },
+    }
+}
