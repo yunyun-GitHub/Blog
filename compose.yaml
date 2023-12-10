@@ -26,6 +26,7 @@ services:
     container_name: webserver
     command: python manage.py runserver 0.0.0.0:8000
     environment:
+      PRODUCTION: ${PRODUCTION}
       SECRET_KEY: ${SECRET_KEY}
       DB_ENGINE: ${DB_ENGINE}
       DB_HOST: ${DB_HOST}
@@ -33,7 +34,9 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      PRODUCTION: ${PRODUCTION}
+      SMTP_SERVER: ${SMTP_SERVER}
+      EMAIL_SENDER: ${EMAIL_SENDER}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
     ports:
       - "8000:8000"
     volumes:
