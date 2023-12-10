@@ -70,7 +70,6 @@ class SMSCodeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         data['code'] = Tools.generate_verification_code()  # code字段由後端生成,隨機生成一個6位數驗證碼
-        result = Email().send(email=data['email'], code=data['code'])  # 发送验证码邮件
-        if result['code'] != 'OK':  # 如果發送失敗給前端返回錯誤
+        if not Email.send(data['email'], data['code']):  # 如果發送失敗給前端返回錯誤
             raise serializers.ValidationError({'email': '无法发送验证码邮件'})
         return data

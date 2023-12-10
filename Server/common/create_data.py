@@ -78,22 +78,6 @@ def role_add_api():
             print(role, '不存在')
 
 
-def create_admin():
-    """創建admin用戶"""
-    print("========創建admin用戶========")
-    data = {'username': 'admin', 'password': 'admin', 'email': 'admin@gmail.com'}
-
-    if not User.objects.filter(username=data['username']).exists():
-        if not User.objects.filter(email=data['email']).exists():
-            User.objects.create_superuser(**data)
-            print(data, "成功")
-        else:
-            print(data['email'], "已存在")
-    else:
-        print(data['username'], "已存在")
-
-
 create_role()  # 創建用戶角色
 create_api()  # 創建API信息
-create_admin()  # 創建admin用戶
 role_add_api()  # 為角色添加權限
