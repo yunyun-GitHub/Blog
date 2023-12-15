@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Server.settings")
 django.setup()
 
-from users.models import Role, API, User
+from users.models import Role, API
 
 
 def create_role():
@@ -60,7 +60,7 @@ def role_add_api():
     print("========為角色添加權限========")
     role_list = {
         'AnonymousUser': ['注冊用戶', '發送驗證碼', '獲取博客列表', '獲取單個博客'],
-        'NormalUser': ['發送驗證碼', '獲取博客列表', '獲取單個博客', '創建博客', '刪除博客', '修改博客', '上传图片', '獲取用戶信息', '修改用戶信息'],
+        'NormalUser': ['注冊用戶', '發送驗證碼', '獲取博客列表', '獲取單個博客', '創建博客', '刪除博客', '修改博客', '上传图片', '獲取用戶信息', '修改用戶信息'],
     }
 
     for role, apis in role_list.items():
