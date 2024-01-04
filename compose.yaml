@@ -1,6 +1,6 @@
 services:
   mysql:
-    image: mysql
+    image: mysql:8.2
     container_name: mysql
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -17,12 +17,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+ 
   webserver:
     build:
       context: ./Server/  # 上下文路徑
       dockerfile: ./Dockerfile
-    image: webserver
+    image: webserver:1.0
     container_name: webserver
     command: python manage.py runserver 0.0.0.0:8000
     environment:
@@ -48,7 +48,7 @@ services:
         condition: service_healthy
 
   nginx:
-    image: nginx
+    image: nginx:1.25-alpine
     container_name: nginx
     ports:
       - "80:80"
